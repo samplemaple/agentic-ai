@@ -1,0 +1,75 @@
+{
+    "user": {
+        "name": "你的名字",
+        "city": "南京",
+        "cityCode": "101190101",
+        "lat": "32.06",
+        "lon": "118.78",
+        "timezone": "Asia/Shanghai",
+        "language": "zh-CN"
+    },
+    "schedule": {
+        "morning": "0 7 * * *",
+        "evening": "0 19 * * *",
+        "weeklyReportDay": "friday"
+    },
+    "modules": {
+        "weather": {
+            "enabled": true,
+            "primary": {
+                "provider": "Open-Meteo",
+                "api": "https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&daily=precipitation_probability_max&timezone=Asia/Shanghai&forecast_days=1",
+                "note": "免费 API，无需 key。{lat} 和 {lon} 由 Agent 替换为 user.lat 和 user.lon 的值。weather_code 参照 WMO 标准解读天气状况。"
+            },
+            "fallback": {
+                "provider": "wttr.in",
+                "api": "https://wttr.in/{city}?format=j1&lang=zh",
+                "note": "URL 中的 {city} 由 Agent 替换为 user.city 的值"
+            }
+        },
+        "calendar": {
+            "enabled": true,
+            "source": "local",
+            "file": "/root/morning-briefing/calendar.md",
+            "note": "本地日历文件；也可通过 fetch MCP 调用企微日历 API"
+        },
+        "reminders": {
+            "enabled": true,
+            "file": "/root/morning-briefing/reminders.md"
+        },
+        "news": {
+            "enabled": true,
+            "sources": [
+                {
+                    "name": "AI 行业",
+                    "url": "https://www.infoq.cn/feed",
+                    "filter": "AI, LLM, Agent, 大模型, 智能体"
+                },
+                {
+                    "name": "技术热点",
+                    "url": "https://www.oschina.net/news/rss",
+                    "filter": ""
+                },
+                {
+                    "name": "36氪",
+                    "url": "https://36kr.com/feed",
+                    "filter": "AI, 融资, SaaS"
+                }
+            ],
+            "maxItems": 3
+        },
+        "reading": {
+            "enabled": true,
+            "file": "/root/morning-briefing/reading-list.md",
+            "maxItems": 2
+        },
+        "quote": {
+            "enabled": true,
+            "style": "简短有力的中文句子，偏向行动和专注，不要鸡汤"
+        }
+    },
+    "output": {
+        "format": "structured",
+        "pushTo": "wechat"
+    }
+}

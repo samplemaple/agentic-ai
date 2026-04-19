@@ -11,7 +11,7 @@
 
 无论你是：
 - **想把 OpenClaw 跑起来的开发者** — 一键部署脚本，30 分钟从零到能用
-- **想让 Agent 接入微信/企微/飞书的用户** — 逐步指南，扫码即用
+- **想让 Agent 接入微信/企微的用户** — 逐步指南，扫码即用
 - **想在团队中落地 AI Agent 的技术负责人** — 生产级配置、安全架构、成本控制
 - **想系统学习 AI 业务流架构的学员** — 配套课程《AI 业务流架构师》全部教辅资料
 
@@ -28,6 +28,10 @@
 | 配置 Hotai 代理（海外旗舰模型） | [openclaw-models/hotai-api.md](openclaw-models/hotai-api.md) |
 | 排查部署问题 | [openclaw-infra/checklists/troubleshooting.md](openclaw-infra/checklists/troubleshooting.md) |
 | 安全加固检查 | [openclaw-infra/checklists/security-checklist.md](openclaw-infra/checklists/security-checklist.md) |
+| Agent 自动化安全加固 | [openclaw-infra/checklists/agent-security-checklist.md](openclaw-infra/checklists/agent-security-checklist.md) |
+| 构建 Agent 军团 | [openclaw-multi-agent/](openclaw-multi-agent/) |
+| 晨间执行官（每日自动简报） | [openclaw-morning-briefing/](openclaw-morning-briefing/) |
+| SEO 内容流水线（自动发布） | [openclaw-seo-pipeline/](openclaw-seo-pipeline/) |
 
 ## 目录结构
 
@@ -43,21 +47,29 @@
 │   │   └── commands-cheatsheet.sh    #   运维命令速查卡
 │   └── checklists/
 │       ├── security-checklist.md     #   安全配置检查清单
+│       ├── agent-security-checklist.md #  Agent 自动化安全加固清单
 │       └── troubleshooting.md        #   常见问题排错指南（9 个场景）
 │
 ├── openclaw-im/                      # IM 渠道接入
 │   ├── wechat-clawbot.md             #   微信 ClawBot 接入指南
-│   ├── wecom-bot.md                  #   企业微信长连接机器人接入指南
-│   └── feishu.md                     #   飞书原生深度集成指南（即将更新）
+│   └── wecom-bot.md                  #   企业微信长连接机器人接入指南
 │
 ├── openclaw-models/                  # 模型配置与成本控制
 │   ├── volcengine-coding-plan.md     #   火山引擎 Coding Plan 购买与配置
 │   └── hotai-api.md                  #   Hotai2API 海外模型代理接入
 │
+├── openclaw-multi-agent/             # 多 Agent 协作与路由调度
+│   └── README.md                     #   Agent 军团架构、配置、分阶段路线图
+│
+├── openclaw-morning-briefing/        # 实战案例：晨间执行官
+│   └── README.md                     #   每日自动简报，天气+日程+热点+阅读推荐
+│
+├── openclaw-seo-pipeline/            # 实战案例：SEO 内容流水线
+│   └── README.md                     #   竞品爬取→内容生成→WordPress 自动发布
+│
 ├── openclaw-soul/                    # 人格工程：SOUL.md 设计与调教（即将更新）
 ├── openclaw-heartbeat/               # 心跳引擎：Heartbeat 定时自动化（即将更新）
 ├── openclaw-skills/                  # 技能开发：Skills 编写与 ClawHub 生态（即将更新）
-├── openclaw-multi-agent/             # 多 Agent 协作与路由调度（即将更新）
 └── claude-code/                      # Claude Code CLI 深度实战（即将更新）
 ```
 
@@ -71,6 +83,7 @@
 | [scripts/setup-openclaw.sh](openclaw-infra/scripts/setup-openclaw.sh) | 一键部署脚本（交互式） |
 | [scripts/commands-cheatsheet.sh](openclaw-infra/scripts/commands-cheatsheet.sh) | 运维命令速查卡 |
 | [checklists/security-checklist.md](openclaw-infra/checklists/security-checklist.md) | 安全配置检查清单 |
+| [checklists/agent-security-checklist.md](openclaw-infra/checklists/agent-security-checklist.md) | Agent 自动化安全加固清单 |
 | [checklists/troubleshooting.md](openclaw-infra/checklists/troubleshooting.md) | 常见问题排错指南（9 个场景） |
 
 ### 📂 [openclaw-im/](openclaw-im/) — IM 渠道接入
@@ -79,7 +92,6 @@
 |------|------|
 | [wechat-clawbot.md](openclaw-im/wechat-clawbot.md) | 微信 ClawBot 接入：官方插件，一条命令 + 扫码 |
 | [wecom-bot.md](openclaw-im/wecom-bot.md) | 企业微信长连接机器人：免公网 IP，支持群聊 + 文档 MCP |
-| [feishu.md](openclaw-im/feishu.md) | 飞书原生深度集成（即将更新） |
 
 ### 📂 [openclaw-models/](openclaw-models/) — 模型配置与成本控制
 

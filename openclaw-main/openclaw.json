@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.4.15",
+    "lastTouchedAt": "2026-04-19T09:36:38.548Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-04-19T08:40:31.478Z",
+    "lastRunVersion": "2026.4.15",
+    "lastRunCommand": "configure",
+    "lastRunMode": "local"
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/root/.openclaw/workspace",
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "model": {
+        "primary": "custom-api-deepseek-com/deepseek-reasoner"
+      },
+      "models": {
+        "custom-api-deepseek-com/deepseek-chat": {
+          "alias": "deepseekchat"
+        },
+        "custom-api-deepseek-com/deepseek-reasoner": {
+          "alias": "deepseekR1"
+        }
+      }
+    },
+    "list": [
+      {
+        "id": "main"
+      },
+      {
+        "id": "morning",
+        "name": "morning",
+        "workspace": "/root/.openclaw/workspace/morning",
+        "agentDir": "/root/.openclaw/agents/morning/agent"
+      }
+    ]
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "e9672ca31eca0f502530819f95de9d9253f65548fb99aa45"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "controlUi": {
+      "allowedOrigins": [
+        "http://localhost:18789",
+        "http://127.0.0.1:18789",
+        "https://iv-yekai6mkn4sobos7uo0f.tailc81ecf.ts.net"
+      ]
+    }
+  },
+  "plugins": {
+    "entries": {
+      "ai-assistant-security-openclaw": {
+        "enabled": false
+      },
+      "feishu": {
+        "enabled": false
+      },
+      "openclaw-qqbot": {
+        "enabled": true
+      },
+      "dingtalk-connector": {
+        "enabled": true
+      },
+      "openclaw-lark": {
+        "enabled": true
+      },
+      "openclaw-weixin": {
+        "enabled": true
+      },
+      "wecom-openclaw-plugin": {
+        "enabled": true
+      }
+    },
+    "installs": {
+      "ai-assistant-security-openclaw": {
+        "source": "npm",
+        "spec": "@omni-shield/ai-assistant-security-openclaw",
+        "installPath": "/root/.openclaw/extensions/ai-assistant-security-openclaw",
+        "version": "1.1.0",
+        "resolvedName": "@omni-shield/ai-assistant-security-openclaw",
+        "resolvedVersion": "1.1.0",
+        "resolvedSpec": "@omni-shield/ai-assistant-security-openclaw@1.1.0",
+        "integrity": "sha512-AFoGOzUckIrUMxUxqv3tZtuTMc7u/QEC+7Nof7VzLrxNphsNqethPhr2IHbp8QMKPlsJD7R0JwzyljvtyNDIfQ==",
+        "shasum": "c4cd2f1410b7bad5b91720f1a01c6b1c7b60d728",
+        "resolvedAt": "2026-04-14T11:23:52.114Z",
+        "installedAt": "2026-04-14T11:23:52.143Z"
+      },
+      "openclaw-qqbot": {
+        "source": "npm",
+        "spec": "@tencent-connect/openclaw-qqbot@1.7.1",
+        "installPath": "/root/.openclaw/extensions/openclaw-qqbot",
+        "version": "1.7.1",
+        "resolvedName": "@tencent-connect/openclaw-qqbot",
+        "resolvedVersion": "1.7.1",
+        "resolvedSpec": "@tencent-connect/openclaw-qqbot@1.7.1",
+        "integrity": "sha512-h7rQFxsDpfBIQG8eGkQixSdSQB05eqF9waCWo8bKI/5K+v53dh+jiJr8va1pqVIpCTYPXFw0VaVNfOtlnjE/DQ==",
+        "shasum": "e1dc206b2b59b11c977c55df87c4eeff936c45e4",
+        "resolvedAt": "2026-04-14T11:24:00.202Z",
+        "installedAt": "2026-04-14T11:25:46.696Z"
+      },
+      "dingtalk-connector": {
+        "source": "npm",
+        "spec": "@dingtalk-real-ai/dingtalk-connector@0.8.13",
+        "installPath": "/root/.openclaw/extensions/dingtalk-connector",
+        "version": "0.8.13",
+        "resolvedName": "@dingtalk-real-ai/dingtalk-connector",
+        "resolvedVersion": "0.8.13",
+        "resolvedSpec": "@dingtalk-real-ai/dingtalk-connector@0.8.13",
+        "integrity": "sha512-vq4ooab1LMdqCZ43GCO824R3v1EqrDNq3lrvybU99nyxY8RbAkz75Cm3mla/1Hz/jRXi3cicX96gxjuj44ldSQ==",
+        "shasum": "86cd1aa3bcc6022358e34ea1553c9584b6bbcf21",
+        "resolvedAt": "2026-04-14T11:25:48.741Z",
+        "installedAt": "2026-04-14T11:26:07.925Z"
+      },
+      "openclaw-lark": {
+        "source": "archive",
+        "sourcePath": "/tmp/openclaw-lark-HAkCi5/larksuite-openclaw-lark-2026.4.7.tgz",
+        "installPath": "/root/.openclaw/extensions/openclaw-lark",
+        "version": "2026.4.7",
+        "installedAt": "2026-04-14T11:36:50.499Z"
+      },
+      "openclaw-weixin": {
+        "source": "npm",
+        "spec": "@tencent-weixin/openclaw-weixin@latest",
+        "installPath": "/root/.openclaw/extensions/openclaw-weixin",
+        "version": "2.1.8",
+        "resolvedName": "@tencent-weixin/openclaw-weixin",
+        "resolvedVersion": "2.1.8",
+        "resolvedSpec": "@tencent-weixin/openclaw-weixin@2.1.8",
+        "integrity": "sha512-YM2fumDI+NvslhFH4gsek+scgCwTdyz7eMDyfNadCTXPjh9hoosn8tcMF0P90gQJEGEud7AJXiKKd8IKGNCfRA==",
+        "shasum": "0eb590449ee94aa852dd9df4f2fb378c46bc7774",
+        "resolvedAt": "2026-04-18T12:49:52.020Z",
+        "installedAt": "2026-04-18T12:50:31.455Z"
+      },
+      "wecom-openclaw-plugin": {
+        "source": "npm",
+        "spec": "@wecom/wecom-openclaw-plugin@latest",
+        "installPath": "/root/.openclaw/extensions/wecom-openclaw-plugin",
+        "version": "2026.4.8",
+        "resolvedName": "@wecom/wecom-openclaw-plugin",
+        "resolvedVersion": "2026.4.8",
+        "resolvedSpec": "@wecom/wecom-openclaw-plugin@2026.4.8",
+        "integrity": "sha512-bGbS8493sHT34FAYaugep2OLjb4dvYfLXMSfZguK/4s8i5PM//2iy4XPUsniacl8LNSUxiF/FuQGM/LJxNwrFg==",
+        "shasum": "f2e8c0346dc274b9586a38b9f51796ee4e75e9c1",
+        "resolvedAt": "2026-04-18T13:02:26.450Z",
+        "installedAt": "2026-04-18T13:02:47.412Z"
+      }
+    },
+    "allow": [
+      "device-pair",
+      "memory-core",
+      "phone-control",
+      "talk-voice",
+      "dingtalk-connector",
+      "openclaw-lark",
+      "openclaw-qqbot",
+      "openclaw-weixin",
+      "wecom-openclaw-plugin"
+    ],
+    "deny": [
+      "amazon-bedrock",
+      "amazon-bedrock-mantle",
+      "anthropic",
+      "anthropic-vertex",
+      "byteplus",
+      "chutes",
+      "cloudflare-ai-gateway",
+      "comfy",
+      "copilot-proxy",
+      "deepseek",
+      "fal",
+      "fireworks",
+      "github-copilot",
+      "google",
+      "huggingface",
+      "kilocode",
+      "kimi",
+      "litellm",
+      "microsoft-foundry",
+      "minimax",
+      "mistral",
+      "moonshot",
+      "nvidia",
+      "ollama",
+      "openai",
+      "opencode",
+      "opencode-go",
+      "openrouter",
+      "qianfan",
+      "qwen",
+      "sglang",
+      "stepfun",
+      "synthetic",
+      "together",
+      "venice",
+      "vercel-ai-gateway",
+      "vllm",
+      "volcengine",
+      "vydra",
+      "xai",
+      "xiaomi",
+      "zai",
+      "arcee"
+    ]
+  },
+  "tools": {
+    "alsoAllow": [
+      "feishu_bitable_app",
+      "feishu_bitable_app_table",
+      "feishu_bitable_app_table_field",
+      "feishu_bitable_app_table_record",
+      "feishu_bitable_app_table_view",
+      "feishu_calendar_calendar",
+      "feishu_calendar_event",
+      "feishu_calendar_event_attendee",
+      "feishu_calendar_freebusy",
+      "feishu_chat",
+      "feishu_chat_members",
+      "feishu_create_doc",
+      "feishu_doc_comments",
+      "feishu_doc_media",
+      "feishu_drive_file",
+      "feishu_fetch_doc",
+      "feishu_get_user",
+      "feishu_im_bot_image",
+      "feishu_im_user_fetch_resource",
+      "feishu_im_user_get_messages",
+      "feishu_im_user_get_thread_messages",
+      "feishu_im_user_message",
+      "feishu_im_user_search_messages",
+      "feishu_oauth",
+      "feishu_oauth_batch_auth",
+      "feishu_search_doc_wiki",
+      "feishu_search_user",
+      "feishu_sheet",
+      "feishu_task_comment",
+      "feishu_task_subtask",
+      "feishu_task_task",
+      "feishu_task_tasklist",
+      "feishu_update_doc",
+      "feishu_wiki_space",
+      "feishu_wiki_space_node",
+      "wecom_mcp"
+    ]
+  },
+  "channels": {
+    "openclaw-weixin": {
+      "channelConfigUpdatedAt": "2026-04-18T12:51:53.874Z"
+    },
+    "wecom": {
+      "enabled": true,
+      "botId": "aib2DcJSPC48SWvJ7RIaLVPnSX2uPBEhOKf",
+      "secret": "X6xhSArOmQydaQV79LeCY7cGrdDVectn7uW1jcPfdmf"
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "custom-api-deepseek-com": {
+        "baseUrl": "https://api.deepseek.com/v1",
+        "api": "openai-completions",
+        "apiKey": "sk-0546dbbefe54471ca5e60e67205a2227",
+        "models": [
+          {
+            "id": "deepseek-chat",
+            "name": "deepseek-chat (Custom Provider)",
+            "contextWindow": 16000,
+            "maxTokens": 4096,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "reasoning": false
+          },
+          {
+            "id": "deepseek-reasoner",
+            "name": "deepseek-reasoner (Custom Provider)",
+            "contextWindow": 16000,
+            "maxTokens": 4096,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "reasoning": false
+          }
+        ]
+      }
+    }
+  }
+}
