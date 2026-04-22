@@ -62,9 +62,14 @@ https://console.volcengine.com/ark/region:ark+cn-beijing/apikey
 | 项目 | Coding Plan（包月） | 在线推理（按量计费） |
 |------|-------------------|-------------------|
 | Base URL | `https://ark.cn-beijing.volces.com/api/coding/v3` | `https://ark.cn-beijing.volces.com/api/v3` |
+| 模型调用方式 | 直接用模型名（如 `kimi-k2.5`） | 需要先创建「接入点」，用接入点 ID 调用（如 `ep-2026xxxx-xxxxx`） |
+| 是否需要接入点 | **不需要**，平台统一调度 | **需要**，每个模型手动创建 |
 | 计费方式 | 固定月费，超额自动停止 | 按 Token 计费，无上限 |
+| 适合场景 | 日常使用，成本可控 | 需要 Coding Plan 套餐外的特定模型 |
 
 > ⚠️ **最常见的错误：** 把 Base URL 写成 `/api/v3`（在线推理地址），导致不走 Coding Plan 额度而产生额外费用。正确地址是 `/api/coding/v3`。
+
+**简单来说：用 Coding Plan 就不需要创建接入点，直接填模型名即可。** 接入点是在线推理模式的概念，两者不要混淆。
 
 ### Step 1：编辑 OpenClaw 配置文件
 
@@ -266,7 +271,45 @@ systemctl restart openclaw
 
 ---
 
-## 六、常见问题排查
+## 六、补充：在线推理接入点（按量计费）
+
+如果你需要使用 Coding Plan 套餐外的模型（如特定版本的豆包模型），或者在未订阅 Coding Plan 的情况下使用火山引擎，需要通过「在线推理」方式接入。这种方式需要手动创建接入点。
+
+> 大多数场景下 Coding Plan 已经够用，本节内容仅作补充。
+
+### 创建接入点
+
+1. 访问火山引擎控制台：`https://console.volcengine.com/ark/region:ark+cn-beijing/endpoint`
+2. 点击「创建接入点」
+3. 选择你需要的模型（如 `doubao-seed-2-0-pro-260215`）
+4. 创建完成后，复制接入点 ID（格式如 `ep-20260413045435-2shmq`）
+
+### 在 OpenClaw 中配置
+
+```json
+"volcengine-online": {
+    "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
+    "apiKey": "你的火山引擎 API Key",
+    "api": "openai-completions",
+    "models": [
+        {
+            "id": "ep-20260413045435-2shmq",
+            "name": "Doubao Seed Pro"
+        }
+    ]
+}
+```
+
+**注意事项：**
+
+- Base URL 是 `/api/v3`（不是 `/api/coding/v3`）
+- 模型 ID 填的是接入点 ID（`ep-xxxx`），不是模型名
+- 按 Token 计费，无月费上限，务必关注用量
+- 不要和 Coding Plan 的 provider 混在同一个配置块里，建议用不同的 provider 名（如 `volcengine` 用于 Coding Plan，`volcengine-online` 用于在线推理）
+
+---
+
+## 七、常见问题排查
 
 | 症状 | 原因 | 解决方案 |
 |------|------|----------|
@@ -280,7 +323,7 @@ systemctl restart openclaw
 
 ---
 
-## 七、费用说明
+## 八、费用说明
 
 - **Coding Plan 包月套餐：** 固定月费，超出当日/月度额度后请求会报错，不会产生额外费用
 - **Embedding 模型：** 包含在 Coding Plan 中，不额外计费
