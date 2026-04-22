@@ -1,127 +1,124 @@
 ---
 inclusion: manual
+description: OpenClaw Agent 构建速查，包含 Token 优化规则、工具精简、配置变更生效方式和常见踩坑
 ---
 
-# OpenClaw Agent 构建经验指南
+# OpenClaw Agent 构建速查
 
-基于晨间执行官（morning agent）项目的实战经验总结。
+> 详细踩坑记录和完整命令见 `openclaw-multi-agent/agent-building-guide.md`
 
-## Token 优化（最重要）
+---
 
-Token 消耗的三大来源：Tool schemas > Skills list > Bootstrap 文件。优化优先级按此排序。
+## 一、Token 优化规则
 
-### 1. 限制工具范围（效果最大，可省 50-80%）
-- 每个 cron job 用 `--tools` 参数只加载必要工具（如 `--tools read,write,fetch`）
-- 在 agents.list 中为子 Agent 配置 `tools.allow`，防止全局工具污染
-- `tools.alsoAllow` 只保留真正需要的 MCP 工具，每个工具 schema 约 300-500 tokens
-- 投递类 job 只需 `--tools read`
+消耗来源排序：Tool schemas > Skills list > AGENTS.md > SOUL.md > 对话历史
 
-### 2. 限制 Skills（可省 ~3,000 tok）
-- 用 `agents.list[].skills` 为每个 Agent 设置 skills allowlist
-- 不需要 skills 的 Agent 设为空数组 `skills: []`
-- 插件安装的 skills（如飞书、企微）即使插件 disabled，skills 仍会加载，必须通过 allowlist 排除
+### 1. 工具白名单（效果最大）
 
-```json
-{
-  "agents": {
-    "list": [
-      { "id": "main", "skills": ["weather", "healthcheck"] },
-      { "id": "morning", "skills": [], "tools": { "allow": ["read", "write", "fetch", "search"] } }
-    ]
-  }
-}
-```
+每个 Agent 只加载需要的工具，每个工具 schema 约 165 tok。
 
-### 3. 精简 SOUL.md（可省 10-20%）
+| Agent | tools.allow | 说明 |
+|-------|------------|------|
+| main | read, edit, write, exec, process, message, web_fetch, memory_search, memory_get, agents_list, sessions_spawn, sessions_send, sessions_list, subagents（14 个） | 去掉 canvas/tts/image/pdf/qqbot_remind/wecom_mcpSession/sessions_history/sessions_yield/session_status |
+| morning | read, write, fetch, search（4 个） | 极简，只做简报生成 |
+| cron 投递 job | read（1 个） | 只需读 /tmp 文件 |
+
+### 2. Skills 白名单
+
+- main：`["weather", "healthcheck"]`
+- 子 Agent：`[]`（空数组）
+- 插件安装的 skills 即使插件 disabled 仍会加载，必须通过 allowlist 排除
+
+### 3. AGENTS.md 裁剪
+
+默认模板 ~1,951 tok，裁剪后 ~959 tok。去掉的内容：
+
+- 群聊规则（微信 ClawBot 不支持群聊）
+- Reactions（微信不支持）
+- Voice Storytelling / TTS（未配置 ElevenLabs）
+- Discord/WhatsApp 格式规则（只用微信）
+- Heartbeat 详细检查项和 Memory Maintenance（用 cron 不用 heartbeat 巡逻）
+
+### 4. SOUL.md 精简
+
 - 控制在 50 行以内
-- 定时任务的详细流程写在 cron message 里，不写在 SOUL.md
-
-### 4. 其他优化
-- cron job 加 `--light-context` 减少平台系统 prompt 开销
-- 简单任务用 deepseek-chat + `--thinking off`，复杂任务才用 reasoner
-- 长对话用 `/compact` 压缩历史
-- 用 `/context list` 和 `/context detail` 诊断 token 构成
-
-### 实测效果
-
-| 场景 | 优化前 | 优化后 |
-|------|--------|--------|
-| 定时任务（晨间简报） | ~30,000 tok | ~4,500 tok |
-| 日常对话（简单问答） | ~65,000 tok | ~131 tok（有缓存） |
-| 系统 prompt 固定开销 | ~10,108 tok | ~7,406 tok |
-
-## 子 Agent 微信投递问题
-
-OpenClaw 2026.4.15 的限制：
-- 子 Agent 无法直接投递到 main 绑定的微信渠道
-- `agents bind` 会抢走 main 的消息入口（双向绑定）
-- `sessions_spawn` 返回结果会被系统 NO_REPLY 拦截
-- 不支持 `--deliver-to`、`outboundChannels`、`inheritChannelFrom`
-
-**解决方案（文件中转）**：
-- 子 Agent cron job 生成内容写入 /tmp 文件，`--no-deliver`
-- main Agent 延后 5 分钟的 cron job 读取文件并投递，`--tools read`
-- 正常对话仍走 sessions_spawn，不受影响
-
-## Cron Job 配置模板
-
-```bash
-# 生成 job（子 Agent 执行，不投递）
-openclaw cron add \
-  --name "任务名" \
-  --agent <子agent-id> \
-  --cron "0 6 * * *" \
-  --tz Asia/Shanghai \
-  --no-deliver \
-  --light-context \
-  --tools read,write,fetch \
-  --model custom-api-deepseek-com/deepseek-chat \
-  --message "具体任务描述...最后写入 /tmp/output.txt"
-
-# 投递 job（main 读取并发送）
-openclaw cron add \
-  --name "任务名投递" \
-  --agent main \
-  --cron "5 6 * * *" \
-  --tz Asia/Shanghai \
-  --channel openclaw-weixin \
-  --announce \
-  --light-context \
-  --tools read \
-  --model custom-api-deepseek-com/deepseek-chat \
-  --thinking off \
-  --message "读取 /tmp/output.txt 的内容，原样发出"
-```
-
-## SOUL.md 编写原则
-
-- 身份定位 + 数据文件路径 + 核心规则，控制在 50 行
 - 详细流程写在 cron message 里，不写在 SOUL.md
-- 安全边界必须保留（禁止访问内网、禁止输出凭证）
-- 格式模板用简短描述，不要写完整示例
+- 安全边界必须保留
 
-## 项目文件结构
+### 5. Cron Job 优化
+
+- `--light-context` 减少系统 prompt 开销
+- `--tools` 限制工具范围
+- `--thinking off` 用于简单投递任务
+- deepseek-chat 用于日常，deepseek-reasoner 用于复杂任务
+
+### 实测数据
+
+| 指标 | 优化前 | 优化后 |
+|------|--------|--------|
+| main 固定开销 | ~15,000 tok | ~12,300 tok |
+| 定时任务（晨间简报） | ~30,000 tok/次 | ~4,500 tok/次 |
+| AGENTS.md | 1,951 tok | 959 tok |
+| Tool schemas | 3,798 tok（23 个） | 2,988 tok（14 个） |
+
+---
+
+## 二、配置变更生效方式
+
+| 改了什么 | 怎么生效 |
+|---------|---------|
+| SOUL.md / AGENTS.md | 下次新会话自动生效 |
+| openclaw.json 中 tools/skills | 需要新会话（`/reset` 或等 `/compact`） |
+| openclaw.json 中 models | `rm ~/.openclaw/agents/main/agent/models.json` + `systemctl restart openclaw` |
+| cron job 参数 | 立即生效，不需要重启 |
+| HEARTBEAT.md | 下次心跳触发时生效 |
+
+微信中触发新会话的方式：
+- `/compact` — 压缩上下文（短时间内不能重复）
+- `/reset` — 彻底重置，聊天记录清零
+- `/context list` — 查看当前 token 构成
+
+---
+
+## 三、架构要点
+
+- 所有 IM 渠道共享一个 main Agent 做路由，子 Agent 不直接对接 IM
+- 微信渠道只绑定在 main 上，不要给子 Agent 绑定（会抢走消息入口）
+- 图片生成、PDF 等能力按需给子 Agent 开，不放在 main 里
+- `compaction.mode: safeguard` 自动压缩，压缩后仍可能占 50-55k/64k
+
+---
+
+## 四、定时任务投递方案
+
+子 Agent 无法直接投递微信，使用文件中转：
 
 ```
-openclaw-<project>/
-├── README.md              # 项目说明
-├── session-context.md     # 当前进度快照（steering auto inclusion）
-└── deploy/
-    ├── agents/<id>/SOUL.md  # Agent 人格文件
-    └── <project>/           # 数据文件（config、日历等）
+6:00  morning Agent 生成简报 → 写入 /tmp/morning-report.txt（--no-deliver）
+6:05  main Agent 读取 /tmp 文件 → 投递到微信（--tools read --announce）
 ```
 
-## 部署命令
+不要用 sessions_spawn 做定时投递（会被系统 NO_REPLY 机制拦截）。
+sessions_spawn 只适合用户实时对话时的路由。
 
-```bash
-# 部署 SOUL.md
-scp deploy/agents/<id>/SOUL.md root@<server>:~/.openclaw/agents/<id>/SOUL.md
+---
 
-# 部署数据文件
-scp deploy/<project>/* root@<server>:/root/<project>/
+## 五、DNS 与网络
 
-# 验证
-ssh root@<server> "openclaw cron list"
-ssh root@<server> "openclaw cron run <job-id>"
-ssh root@<server> "openclaw cron runs --id <job-id> --limit 1"
-```
+- Tailscale MagicDNS 接管 /etc/resolv.conf，可能导致外部域名解析失败
+- 在 Tailscale 后台 https://login.tailscale.com/admin/dns 添加全局 DNS：223.5.5.5 和 8.8.8.8
+- 手动改 /etc/resolv.conf 会被 Tailscale 覆盖，后台配置更可靠
+
+---
+
+## 六、常见踩坑
+
+| 问题 | 原因 | 解决 |
+|------|------|------|
+| 100% context used | contextWindow 默认 16000 太小 | 改为 64000 |
+| 修改 openclaw.json 不生效 | models.json 缓存优先级更高 | 删除 models.json + 重启 |
+| 微信收不到定时任务 | 子 Agent 没有微信渠道 | 用文件中转方案 |
+| agents bind 后消息全跑到子 Agent | 双向绑定抢走 main 入口 | unbind + 只保留 main 绑定 |
+| auth.json 写入内容后控制台卡死 | 必须保持 `{}` 空对象 | 清空为 `{}` |
+| 服务器 DNS 解析失败 | Tailscale MagicDNS 接管 | 后台添加全局 DNS |
+| /compact 提示 skipped | 短时间内不能重复压缩 | 等一会或用 /reset |
