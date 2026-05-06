@@ -23,20 +23,21 @@
 |--------|-------|
 | 在云服务器上部署 OpenClaw | [openclaw-infra/](openclaw-infra/) |
 | 让 Agent 接入微信 | [openclaw-im/wechat-clawbot.md](openclaw-im/wechat-clawbot.md) |
-| 让 Agent 接入企业微信（含群聊） | [openclaw-im/wecom-bot.md](openclaw-im/wecom-bot.md) |
+| 让 Agent 接入企业微信 | [openclaw-im/wecom-bot.md](openclaw-im/wecom-bot.md) |
+| 让 Agent 接入飞书 | [openclaw-im/feishu-openclaw.md](openclaw-im/feishu-openclaw.md) |
+| 查看完整的 openclaw.json 配置模板 | [openclaw.json.example](openclaw.json.example) |
 | 配置火山引擎 Coding Plan（国产模型包月） | [openclaw-models/volcengine-coding-plan.md](openclaw-models/volcengine-coding-plan.md) |
 | 配置 Hotai 代理（海外旗舰模型） | [openclaw-models/hotai-api.md](openclaw-models/hotai-api.md) |
 | 排查部署问题 | [openclaw-infra/checklists/troubleshooting.md](openclaw-infra/checklists/troubleshooting.md) |
 | 安全加固检查 | [openclaw-infra/checklists/security-checklist.md](openclaw-infra/checklists/security-checklist.md) |
-| Agent 自动化安全加固 | [openclaw-infra/checklists/agent-security-checklist.md](openclaw-infra/checklists/agent-security-checklist.md) |
-| 构建 Agent 军团 | [openclaw-multi-agent/](openclaw-multi-agent/) |
-| 晨间执行官（每日自动简报） | [openclaw-morning-briefing/](openclaw-morning-briefing/) |
-| SEO 内容流水线（自动发布） | [openclaw-seo-pipeline/](openclaw-seo-pipeline/) |
+| 给 Agent 铸造灵魂（SOUL.md 设计） | [openclaw-soul/](openclaw-soul/) |
+| 配置心跳巡检与定时任务 | [openclaw-heartbeat/](openclaw-heartbeat/) |
 
 ## 目录结构
 
 ```
 .
+├── openclaw.json.example            # OpenClaw 完整配置模板（脱敏）
 ├── openclaw-infra/                   # 基础设施：部署、守护进程、安全穿透
 │   ├── README.md                     #   OpenClaw 部署指南
 │   ├── configs/
@@ -52,23 +53,31 @@
 │
 ├── openclaw-im/                      # IM 渠道接入
 │   ├── wechat-clawbot.md             #   微信 ClawBot 接入指南
-│   └── wecom-bot.md                  #   企业微信长连接机器人接入指南
+│   ├── wecom-bot.md                  #   企业微信长连接机器人接入指南
+│   └── feishu-openclaw.md            #   飞书原生深度集成指南
 │
 ├── openclaw-models/                  # 模型配置与成本控制
 │   ├── volcengine-coding-plan.md     #   火山引擎 Coding Plan 购买与配置
 │   └── hotai-api.md                  #   Hotai2API 海外模型代理接入
 │
-├── openclaw-multi-agent/             # 多 Agent 协作与路由调度
-│   └── README.md                     #   Agent 军团架构、配置、分阶段路线图
-│
-├── openclaw-morning-briefing/        # 实战案例：晨间执行官
-│   └── README.md                     #   每日自动简报，天气+日程+热点+阅读推荐
-│
-├── openclaw-seo-pipeline/            # 实战案例：SEO 内容流水线
-│   └── README.md                     #   竞品爬取→内容生成→WordPress 自动发布
-│
-├── openclaw-soul/                    # 人格工程：SOUL.md 设计与调教（即将更新）
-├── openclaw-heartbeat/               # 心跳引擎：Heartbeat 定时自动化（即将更新）
+├── openclaw-soul/                    # 人格工程：SOUL.md 与 AGENTS.md 设计模板
+│   ├── README.md                     #   SOUL.md 四层建造法 + AGENTS.md 权限矩阵指南
+│   ├── lesson05-lab.md               #   第5节实验手册（可直接跟着操作）
+│   ├── templates/
+│   │   ├── SOUL.md.example           #   通用模板（带注释的四层结构）
+│   │   └── AGENTS.md.example         #   通用模板（权限矩阵 + 记忆管理）
+│   └── examples/
+│       ├── dev-assistant/            #   研发助手完整配置（课程实战版）
+│       ├── biz-assistant/            #   业务管家完整配置
+│       └── devops-agent/             #   DevOps 运维场景（社区案例）
+├── openclaw-heartbeat/                # 心跳引擎：Heartbeat + Cron 自动化
+│   ├── README.md                     #   Cron vs Heartbeat 选型 + 四条黄金法则
+│   ├── lesson06-lab.md               #   第6节实验手册（可直接跟着操作）
+│   ├── templates/
+│   │   └── HEARTBEAT.md.example      #   通用模板（带注释的四步法骨架）
+│   └── examples/
+│       ├── morning-briefing-heartbeat.md  #  多轮资讯日报巡检配置
+│       └── memory-guardian-heartbeat.md   #  记忆守护巡检配置（含资讯巡检）
 ├── openclaw-skills/                  # 技能开发：Skills 编写与 ClawHub 生态（即将更新）
 └── claude-code/                      # Claude Code CLI 深度实战（即将更新）
 ```
@@ -92,6 +101,7 @@
 |------|------|
 | [wechat-clawbot.md](openclaw-im/wechat-clawbot.md) | 微信 ClawBot 接入：官方插件，一条命令 + 扫码 |
 | [wecom-bot.md](openclaw-im/wecom-bot.md) | 企业微信长连接机器人：免公网 IP，支持群聊 + 文档 MCP |
+| [feishu-openclaw.md](openclaw-im/feishu-openclaw.md) | 飞书原生深度集成 |
 
 ### 📂 [openclaw-models/](openclaw-models/) — 模型配置与成本控制
 
@@ -99,6 +109,27 @@
 |------|------|
 | [hotai-api.md](openclaw-models/hotai-api.md) | Hotai2API：国内直连海外旗舰模型（GPT-5.4 / Claude Opus 4.6） |
 | [volcengine-coding-plan.md](openclaw-models/volcengine-coding-plan.md) | 火山引擎 Coding Plan：国产模型包月，含 Embedding 配置 |
+
+### 📂 [openclaw-soul/](openclaw-soul/) — 人格工程
+
+| 文件 | 说明 |
+|------|------|
+| [README.md](openclaw-soul/README.md) | SOUL.md 四层建造法 + AGENTS.md 权限矩阵设计指南 |
+| [templates/SOUL.md.example](openclaw-soul/templates/SOUL.md.example) | 通用模板：带注释的四层结构（Identity → Style → Rules → Boundaries） |
+| [templates/AGENTS.md.example](openclaw-soul/templates/AGENTS.md.example) | 通用模板：三级权限矩阵 + 记忆管理 + 群聊准则 + 错误处理 |
+| [examples/dev-assistant/](openclaw-soul/examples/dev-assistant/) | 研发助手完整配置（课程实战版，含 SOUL.md + AGENTS.md） |
+| [examples/biz-assistant/](openclaw-soul/examples/biz-assistant/) | 业务管家完整配置 |
+| [examples/devops-agent/](openclaw-soul/examples/devops-agent/) | DevOps 运维场景（社区案例赏析） |
+
+### 📂 [openclaw-heartbeat/](openclaw-heartbeat/) — 心跳与定时任务
+
+| 文件 | 说明 |
+|------|------|
+| [README.md](openclaw-heartbeat/README.md) | Cron vs Heartbeat 选型指南 + HEARTBEAT.md 四条黄金法则 |
+| [lesson06-lab.md](openclaw-heartbeat/lesson06-lab.md) | 第6节实验手册：Cron + Heartbeat 组合实战 |
+| [templates/HEARTBEAT.md.example](openclaw-heartbeat/templates/HEARTBEAT.md.example) | 通用模板：带注释的四步法骨架（条件→判断→动作→静默） |
+| [examples/morning-briefing-heartbeat.md](openclaw-heartbeat/examples/morning-briefing-heartbeat.md) | 多轮资讯日报巡检配置（配合两个 Cron 任务使用） |
+| [examples/memory-guardian-heartbeat.md](openclaw-heartbeat/examples/memory-guardian-heartbeat.md) | 记忆守护巡检配置（含资讯巡检 + 记忆归档检查） |
 
 
 ## 部署架构

@@ -3,9 +3,9 @@
 # OpenClaw 一键部署脚本
 # 课程：AI 业务流架构师 · 第二节课实战
 #
-# 使用方法：
+# 使用方法（root 用户）：
 #   chmod +x setup-openclaw.sh
-#   sudo ./setup-openclaw.sh
+#   ./setup-openclaw.sh
 #
 # 前置条件：
 #   - Ubuntu 24.04 LTS（推荐火山引擎 2C4G ¥99/年）
@@ -71,11 +71,15 @@ echo "npm: $(npm -v)"
 # 安装 OpenClaw
 echo ""
 echo "安装 OpenClaw..."
-npm install -g openclaw@latest
+
+npm install -g "openclaw@2026.4.22"
 
 # 生成 shell 补全（避免 SSH 登录时报错）
 mkdir -p /root/.openclaw/completions
 openclaw completion > /root/.openclaw/completions/openclaw.bash 2>/dev/null || true
+
+# 如有遇到 因为新版本导致的错误`bash: ((: ! $+functions[compdef] : syntax error: operand expected (error token is "$+functions[compdef] ")`
+# 请使用 openclaw completion --shell bash > /root/.openclaw/completions/openclaw.bash 替代
 
 echo ""
 echo "✅ Step 2 完成：Node.js $(node -v) + OpenClaw 已安装"
@@ -91,6 +95,7 @@ echo ""
 
 # 确保配置目录存在
 mkdir -p /root/.openclaw
+mkdir -p /opt
 
 # 配置 API Key
 ENV_FILE="/opt/openclaw.env"
@@ -228,10 +233,27 @@ else
     systemctl enable --now tailscaled
 fi
 
-# 添加公网 DNS（防止 MagicDNS 导致 Let's Encrypt 证书获取超时）
-if ! grep -q '8.8.8.8' /etc/resolv.conf 2>/dev/null; then
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-    echo "   已添加公网 DNS 8.8.8.8（用于 HTTPS 证书获取）"
+# 持久化添加公网 DNS（防止 MagicDNS 导致 Let's Encrypt 证书获取超时）
+# 注意：直接写 /etc/resolv.conf 会被云厂商 DHCP 续租覆盖，这里用 systemd-resolved 持久化
+if [ -d /run/systemd/resolve ]; then
+    # 使用 systemd-resolved（Ubuntu 24.04 默认）
+    mkdir -p /etc/systemd/resolved.conf.d
+    cat > /etc/systemd/resolved.conf.d/public-dns.conf << 'DNS_EOF'
+[Resolve]
+DNS=8.8.8.8 8.8.4.4
+DNS_EOF
+    systemctl restart systemd-resolved 2>/dev/null || true
+    echo "   已通过 systemd-resolved 持久化公网 DNS 8.8.8.8"
+else
+    # 无 systemd-resolved 的系统，回退到直接写入 + 锁定文件
+    if ! grep -q '8.8.8.8' /etc/resolv.conf 2>/dev/null; then
+        # 先解锁（如果之前锁过）
+        chattr -i /etc/resolv.conf 2>/dev/null || true
+        echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+        # 锁定文件防止 DHCP 覆盖
+        chattr +i /etc/resolv.conf 2>/dev/null || true
+        echo "   已添加公网 DNS 8.8.8.8 并锁定 resolv.conf"
+    fi
 fi
 
 echo ""
@@ -283,6 +305,8 @@ echo "5.5  获取 Dashboard 访问地址："
 echo "     openclaw dashboard --no-open"
 echo "     # 将输出 URL 中的 127.0.0.1 替换为你的 Tailscale 域名"
 echo "     # 例如：https://你的设备名.tailnet.ts.net/#token=你的令牌"
+echo "     # 如 openclaw --version 版本 > 2026.4.22 openclaw dashboard --no-open 不会输出token, 需要自己手动拼接 "
+echo "     # 获取token方式: cat /root/.openclaw/openclaw.json|grep -v tokens|grep -v mode|grep token "
 echo ""
 echo "5.6  首次浏览器访问需要设备配对："
 echo "     # 浏览器点 Connect 后如果提示 pairing required，在服务器执行："
