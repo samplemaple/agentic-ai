@@ -8,19 +8,27 @@
 
 ## 仓库定位
 
-OpenClaw + Claude Code 生产部署指南与《AI 业务流架构师》课程配套资料。涵盖 OpenClaw 部署、IM 接入（微信/企微/飞书）、Agent 人格工程（SOUL.md）、心跳自动化、模型配置及变现方案。
+OpenClaw + Claude Code 生产部署指南与《AI 业务流架构师》课程配套资料。涵盖 OpenClaw 部署、飞书 IM 接入、Agent 人格工程（SOUL.md）、心跳自动化、模型配置及变现方案。
+
+## 当前项目状态
+
+- **OpenClaw v2026.5.5** 运行于火山引擎 Ubuntu 22.04，Tailscale 安全穿透
+- **飞书 IM** 已接入，WebSocket 模式，`@larksuite/openclaw-lark` 插件
+- **待完成**：Agent 人格配置（SOUL.md + AGENTS.md）、Heartbeat 定时任务
+- 实时状态见 `project-session.md`
 
 ## 目录结构
 
 ```
 openclaw-infra/              # 基础设施：一键部署、systemd、Tailscale 安全穿透、安全清单
-openclaw-im/                 # IM 渠道接入：微信 ClawBot、企微、飞书
+openclaw-im/                 # IM 渠道接入：飞书原生集成、微信 ClawBot（未启用）、企微（未启用）
 openclaw-models/             # 模型配置：DeepSeek、火山引擎 Coding Plan、Hotai 海外模型
 openclaw-soul/               # 人格工程：SOUL.md 四层建造法 + AGENTS.md 权限矩阵
 openclaw-heartbeat/          # 心跳引擎：Cron vs Heartbeat 选型、HEARTBEAT.md 设计方法论
-openclaw-morning-briefing/   # 晨间/晚间简报系统（已部署运行）
-openclaw-cs-agent/           # 智能客服 Agent（变现方向 A）
+openclaw-morning-briefing/   # 晨间/晚间简报系统（参考模板）
+openclaw-cs-agent/           # 智能客服 Agent（变现方向 A，待开发）
 tools/                       # Claude Code 模型环境切换脚本（PowerShell）
+.kiro/steering/              # Claude Code 自动加载的参考文件
 ```
 
 ## 核心架构概念
@@ -33,37 +41,24 @@ tools/                       # Claude Code 模型环境切换脚本（PowerShell
 
 ## 常用命令
 
+### 服务器连接（SSH + Tailscale）
+- `ssh -i "C:\Users\Administrator\Desktop\LocalPem\Yang260418.pem" root@iv-yekai6mkn4sobos7uo0f-1.tailc81ecf.ts.net`
+- 完整命令速查见 `.kiro/steering/openclaw-commands.md`（Claude 自动加载）
+
 ### 环境切换
-- `.\tools\cc.ps1` — 交互式模型选择器（MiMo / DeepSeek V4）
+- `.\tools\cc.ps1` — 交互式模型选择器
 - `. .\tools\switch-deepseek.ps1` — 切换到 DeepSeek V4 环境
-- `. .\tools\switch-mimo.ps1` — 切换到 MiMo 环境
 - API Key 存放在项目根目录 `.env` 文件
 
-### 服务器部署（SSH + Tailscale）
-- `ssh root@100.69.216.12` — 连接生产服务器
-- `ssh -L 18789:127.0.0.1:18789 root@100.69.216.12` — 端口转发打开 OpenClaw 控制台
-- `scp <本地文件> root@100.69.216.12:~/.openclaw/workspace/<agent>/SOUL.md` — 部署 SOUL.md
-- SOUL.md 同步：`scp` 上传后需 `cp` 从 workspace 同步到 agents 目录
-
-### OpenClaw 管理
-- `openclaw cron list` — 查看所有定时任务
-- `openclaw cron edit <id> --enable/--disable` — 启用/禁用定时任务
-- `openclaw gateway token` — 管理 Gateway 访问令牌
-
-### Session Context
-- `session-context.md` — 中央状态快照（服务器信息、Agent 列表、定时任务、成本、路线图）
-- `openclaw-commands.md` — CLI 命令速查（Claude 自动加载）
-- `agent-building-guide.md` — Token 优化、工具精简、配置技巧（需手动引用）
-- `server-deploy.md` — 连接详情、路径映射、Tailscale 网络（需手动引用）
+### OpenClaw 关键操作
+- `openclaw sessions --active 120` — 查看会话上下文消耗（替代旧的 /context list）
+- `openclaw channels status --probe` — Channel 连接健康检查
+- `openclaw plugins list` — 查看所有插件状态
+- `sudo systemctl restart openclaw` — 改配置后重启 Gateway
 
 ## 重要文件
 
+- `project-session.md` — 中央状态快照（服务器信息、完成/待办事项）
 - `openclaw.json.example` — OpenClaw 完整配置模板
-- `.env` — API Key（已 gitignore，禁止提交）
-- `session-context.md` — 项目状态快照（服务器信息、Agent 列表、定时任务、成本估算、变现路线图）
-
-## 变现方向
-
-- **方向 A（推进中）**: 企业智能客服 Agent — RAG + 多轮对话 + 工具调用 + 转人工
-- **方向 B（已暂停）**: 内容运营 Agent — 热点感知、选题规划、内容质检、效果闭环
-- **方向 C（已暂停）**: 个人效率 Agent — 邮件摘要、GitHub/RSS 监控、日程协调
+- `.env` — API Key + 飞书凭据（已 gitignore，禁止提交）
+- `.kiro/steering/openclaw-commands.md` — CLI 命令速查（Claude 自动加载）
