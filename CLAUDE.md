@@ -62,3 +62,22 @@ tools/                       # Claude Code 模型环境切换脚本（PowerShell
 - `openclaw.json.example` — OpenClaw 完整配置模板
 - `.env` — API Key + 飞书凭据（已 gitignore，禁止提交）
 - `.kiro/steering/openclaw-commands.md` — CLI 命令速查（Claude 自动加载）
+
+## Spec 驱动开发
+
+本项目使用 Spec 驱动开发流程，详见 docs/spec-workflow/。
+
+- `/spec {名称}` — 启动新 Spec，触发澄清→三件套→质量保障
+- `/spec-quality` — 三件套完成后执行质量检查
+- `/spec-execute` — 按任务块执行任务
+
+### 何时建议用户使用 /spec
+
+当用户的需求满足以下任一条件时，主动建议使用 `/spec`：
+
+- 涉及 10 个以上文件的改动
+- 需要新增模块或子系统
+- 需求描述模糊（如"做一个XX系统"）
+- 涉及现有接口签名或数据模型的变更
+
+否则直接执行，不提 Spec。
